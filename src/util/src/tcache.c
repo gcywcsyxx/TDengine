@@ -781,9 +781,14 @@ void taosRefreshDataCache(void *handle, void *tmrId) {
       numOfCheck++;
       pNext = pNode->next;
 
-      if (pNode->time <= time && pNode->refCount <= 0) {
-        taosCacheReleaseNode(pObj, pNode);
+      if (pNode->time <= time) {
+        if (pNode->refCount <= 0) {
+          taosCacheReleaseNode(pObj, pNode);
+        } else {  // refresh data  every pObj->refreshTime
+          taosCacheMoveNodeToTrash(pObj, pNode);
+        }
       }
+
       pNode = pNext;
     }
 
